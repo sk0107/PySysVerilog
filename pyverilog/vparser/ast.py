@@ -50,7 +50,11 @@ class Node(object):
         buf.write('\n')
 
         for c in self.children():
-            c.show(buf, offset + indent, attrnames, showlineno)
+            if type(c) is not tuple:
+                c.show(buf, offset + indent, attrnames, showlineno)
+            else:
+                for item in c:
+                    item.show(buf, offset + indent, attrnames, showlineno)
 
     def __eq__(self, other):
         if type(self) != type(other):
@@ -315,6 +319,10 @@ class Wire(Variable):
 
 
 class Reg(Variable):
+    pass
+
+
+class Logic(Variable):
     pass
 
 

@@ -391,9 +391,6 @@ class VerilogParser(object):
         if 'reg' in sigtypes:
             second = Reg(name=name, width=width, signed=signed,
                          dimensions=dimensions, lineno=lineno)
-        if 'logic' in sigtypes:
-            second = Logic(name=name, width=width, signed=signed,
-                         dimensions=dimensions, lineno=lineno)
         if 'tri' in sigtypes:
             second = Tri(name=name, width=width, signed=signed,
                          dimensions=dimensions, lineno=lineno)
@@ -427,19 +424,9 @@ class VerilogParser(object):
         p[0] = self.create_ioport(p[1], p[3], width=p[2], lineno=p.lineno(3))
         p.set_lineno(0, p.lineno(1))
 
-    def p_ioport_width_width(self, p):
-        'ioport : sigtypes width width portname'
-        p[0] = self.create_ioport(p[1], p[4], width=(p[2], p[3]), lineno=p.lineno(3))
-        p.set_lineno(0, p.lineno(1))
-
     def p_ioport_dimensions(self, p):
         'ioport : sigtypes width portname dimensions'
         p[0] = self.create_ioport(p[1], p[3], width=p[2], dimensions=p[4], lineno=p.lineno(3))
-        p.set_lineno(0, p.lineno(1))
-
-    def p_ioport_width_dimensions(self, p):
-        'ioport : sigtypes width width portname dimensions'
-        p[0] = self.create_ioport(p[1], p[4], width=(p[2], p[3]), dimensions=p[4], lineno=p.lineno(3))
         p.set_lineno(0, p.lineno(1))
 
     def p_ioport_head(self, p):
@@ -452,19 +439,9 @@ class VerilogParser(object):
         p[0] = self.create_ioport(p[1], p[3], width=p[2], lineno=p.lineno(3))
         p.set_lineno(0, p.lineno(1))
 
-    def p_ioport_head_width_width(self, p):
-        'ioport_head : sigtypes width width portname'
-        p[0] = self.create_ioport(p[1], p[4], width=(p[2], p[3]), lineno=p.lineno(3))
-        p.set_lineno(0, p.lineno(1))
-
     def p_ioport_head_dimensions(self, p):
         'ioport_head : sigtypes width portname dimensions'
         p[0] = self.create_ioport(p[1], p[3], width=p[2], dimensions=p[4], lineno=p.lineno(3))
-        p.set_lineno(0, p.lineno(1))
-
-    def p_ioport_width_head_dimensions(self, p):
-        'ioport_head : sigtypes width width portname dimensions'
-        p[0] = self.create_ioport(p[1], p[4], width=(p[2], p[3]), dimensions=p[4], lineno=p.lineno(3))
         p.set_lineno(0, p.lineno(1))
 
     def p_ioport_portname(self, p):
@@ -559,9 +536,6 @@ class VerilogParser(object):
         if 'reg' in sigtypes:
             decls.append(Reg(name=name, width=width,
                              signed=signed, lineno=lineno, dimensions=dimensions))
-        if 'logic' in sigtypes:
-            decls.append(Logic(name=name, width=width,
-                             signed=signed, lineno=lineno, dimensions=dimensions))
         if 'tri' in sigtypes:
             decls.append(Tri(name=name, width=width,
                              signed=signed, lineno=lineno, dimensions=dimensions))
@@ -612,15 +586,6 @@ class VerilogParser(object):
         p[0] = Decl(tuple(decllist), lineno=p.lineno(1))
         p.set_lineno(0, p.lineno(1))
 
-    def p_decl_width_width(self, p):
-        'decl : sigtypes width width declnamelist SEMICOLON'
-        decllist = []
-        for rname, rdimensions in p[4]:
-            decllist.extend(self.create_decl(p[1], rname, width=(p[2], p[3]), dimensions=rdimensions,
-                                             lineno=p.lineno(3)))
-        p[0] = Decl(tuple(decllist), lineno=p.lineno(1))
-        p.set_lineno(0, p.lineno(1))
-
     def p_declnamelist(self, p):
         'declnamelist : declnamelist COMMA declname'
         p[0] = p[1] + (p[3],)
@@ -663,9 +628,6 @@ class VerilogParser(object):
         if 'reg' in sigtypes:
             decls.append(Reg(name=name, width=width,
                              signed=signed, lineno=lineno))
-        if 'logic' in sigtypes:
-            decls.append(Logic(name=name, width=width,
-                             signed=signed, lineno=lineno))
         decls.append(assign)
         return decls
 
@@ -700,13 +662,6 @@ class VerilogParser(object):
         'declassign : sigtypes width declassign_element SEMICOLON'
         decllist = self.create_declassign(
             p[1], p[3][0], p[3][1], width=p[2], lineno=p.lineno(3))
-        p[0] = Decl(tuple(decllist), lineno=p.lineno(1))
-        p.set_lineno(0, p.lineno(1))
-
-    def p_declassign_width_width(self, p):
-        'declassign : sigtypes width width declassign_element SEMICOLON'
-        decllist = self.create_declassign(
-            p[1], p[4][0], p[4][1], width=(p[2], p[3]), lineno=p.lineno(3))
         p[0] = Decl(tuple(decllist), lineno=p.lineno(1))
         p.set_lineno(0, p.lineno(1))
 
@@ -817,28 +772,12 @@ class VerilogParser(object):
         p[0] = Decl(tuple(paramlist), lineno=p.lineno(1))
         p.set_lineno(0, p.lineno(1))
 
-    # NEED TO FIX
-    # def p_parameterdecl_width_width(self, p):
-    #     'parameterdecl : PARAMETER width width param_substitution_list SEMICOLON'
-    #     paramlist = [Parameter(rname, rvalue, p[2], lineno=p.lineno(3))
-    #                  for rname, rvalue in p[3]]
-    #     p[0] = Decl(tuple(paramlist), lineno=p.lineno(1))
-    #     p.set_lineno(0, p.lineno(1))
-
     def p_parameterdecl_signed_width(self, p):
         'parameterdecl : PARAMETER SIGNED width param_substitution_list SEMICOLON'
         paramlist = [Parameter(rname, rvalue, p[3], signed=True, lineno=p.lineno(3))
                      for rname, rvalue in p[4]]
         p[0] = Decl(tuple(paramlist), lineno=p.lineno(1))
         p.set_lineno(0, p.lineno(1))
-
-    # NEED TO FIX
-    # def p_parameterdecl_signed_width_width(self, p):
-    #     'parameterdecl : PARAMETER SIGNED width width param_substitution_list SEMICOLON'
-    #     paramlist = [Parameter(rname, rvalue, p[3], signed=True, lineno=p.lineno(3))
-    #                  for rname, rvalue in p[4]]
-    #     p[0] = Decl(tuple(paramlist), lineno=p.lineno(1))
-    #     p.set_lineno(0, p.lineno(1))
 
     def p_parameterdecl_integer(self, p):
         'parameterdecl : PARAMETER INTEGER param_substitution_list SEMICOLON'
@@ -868,28 +807,12 @@ class VerilogParser(object):
         p[0] = Decl(tuple(paramlist), lineno=p.lineno(1))
         p.set_lineno(0, p.lineno(1))
 
-    # NEED TO FIX
-    # def p_localparamdecl_width_width(self, p):
-    #     'localparamdecl : LOCALPARAM width width param_substitution_list SEMICOLON'
-    #     paramlist = [Localparam(rname, rvalue, p[2], lineno=p.lineno(3))
-    #                  for rname, rvalue in p[3]]
-    #     p[0] = Decl(tuple(paramlist), lineno=p.lineno(1))
-    #     p.set_lineno(0, p.lineno(1))
-
     def p_localparamdecl_signed_width(self, p):
         'localparamdecl : LOCALPARAM SIGNED width param_substitution_list SEMICOLON'
         paramlist = [Localparam(rname, rvalue, p[3], signed=True, lineno=p.lineno(3))
                      for rname, rvalue in p[4]]
         p[0] = Decl(tuple(paramlist), lineno=p.lineno(1))
         p.set_lineno(0, p.lineno(1))
-
-    # NEED TO FIX
-    # def p_localparamdecl_signed_width_width(self, p):
-    #     'localparamdecl : LOCALPARAM SIGNED width width param_substitution_list SEMICOLON'
-    #     paramlist = [Localparam(rname, rvalue, p[3], signed=True, lineno=p.lineno(3))
-    #                  for rname, rvalue in p[4]]
-    #     p[0] = Decl(tuple(paramlist), lineno=p.lineno(1))
-    #     p.set_lineno(0, p.lineno(1))
 
     def p_localparamdecl_integer(self, p):
         'localparamdecl : LOCALPARAM INTEGER param_substitution_list SEMICOLON'
@@ -1887,12 +1810,6 @@ class VerilogParser(object):
 
     def p_instance_body_array(self, p):
         'instance_body : ID width LPAREN instance_ports RPAREN'
-        p[0] = (p[1], p[4], p[2])
-        p.set_lineno(0, p.lineno(1))
-
-    # NEED TO FIX
-    def p_instance_body_2d_array(self, p):
-        'instance_body : ID width width LPAREN instance_ports RPAREN'
         p[0] = (p[1], p[4], p[2])
         p.set_lineno(0, p.lineno(1))
 

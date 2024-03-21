@@ -450,6 +450,9 @@ class Partselect(Node):
         if self.lsb:
             nodelist.append(self.lsb)
         return tuple(nodelist)
+    def __repr__(self):
+        ret = f'{self.var} [ {self.msb} : {self.lsb} ]'
+        return ret
 
 
 class Pointer(Node):
@@ -467,6 +470,10 @@ class Pointer(Node):
         if self.ptr:
             nodelist.append(self.ptr)
         return tuple(nodelist)
+    def __repr__(self):
+        ret = f'{self.var} [ {self.ptr} ]'
+        return ret
+
 
 
 class Lvalue(Node):
